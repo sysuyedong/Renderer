@@ -6,6 +6,10 @@ require ("lua.Ray")
 require ("lua.Sphere")
 require ("lua.Union")
 require ("lua.Vector")
+require ("lua.Light")
+
+WindowWidth = WindowWidth or 256
+WindowHeight = WindowHeight or 256
 
 window_width = WindowWidth
 window_height = WindowHeight
@@ -52,6 +56,23 @@ function renderReflection(scene, ray, result, max_reflect)
 	return c
 end
 
+function renderLight(scene, lights, result)
+	local c = Color.Black
+	if result.geometry then
+		for k, light in ipairs(lights) do
+			local light_sample = light:sample(scene, result.position)
+			if light_sample ~= LightSample.Zero then
+				local NdotL = result.normal:dot(light_sample.L)
+				if NdotL >= 0 then
+					c = c + light_sample.EL * NdotL
+				end
+			end
+		end
+	end
+
+	return c
+end
+
 local plane = Plane.new(Vector.new(0, 1, 0), 0)
 local sp1 = Sphere.new(10, Vector.new(-10, 10, -10))
 local sp2 = Sphere.new(10, Vector.new(10, 10, -10))
@@ -60,6 +81,13 @@ sp1.material = PhongMaterial.new(Color.Red, Color.White, 16, 0.5)
 sp2.material = PhongMaterial.new(Color.Blue, Color.White, 16, 0.5)
 local scene = Union.new({plane, sp1, sp2})
 local camera = Camera.new(Vector.new(0, 5, 18), Vector.new(0, 0, -1), Vector.new(0, 1, 0), 100)
+local dir_light = DirectionLight.new(Color.White, Vector.new(-1.75, -2, -1.5))
+local point_light = PointLight.new(Color.White * 100, Vector.new(0, 25, 0))
+local spot_light = SpotLight.new(Color.White * 2000, Vector.new(25, 40, 20), Vector.new(-1, -1, -1), 20, 30, 0.5)
+local lights = {}
+-- table.insert(lights, dir_light)
+-- table.insert(lights, point_light)
+table.insert(lights, spot_light)
 
 for y = 0, h - 1 do
 	local sy = 1 - y / h
@@ -72,7 +100,8 @@ for y = 0, h - 1 do
 			-- color = renderDepth(result)
 			-- color = renderNormal(result)
 			-- color = renderMaterial(ray, result)
-			color = renderReflection(scene, ray, result, 3)
+			-- color = renderReflection(scene, ray, result, 3)
+			color = renderLight(scene, lights, result)
 		end
 		DrawPixel(x, y, color.value)
 	end

@@ -19,6 +19,10 @@ function Vector.__mul(a, b)
 	return Vector.new(a.x * b, a.y * b, a.z * b)
 end
 
+function Vector.__div(a, b)
+	return Vector.new(a.x / b, a.y / b, a.z / b)
+end
+
 -- component-wise multiplication
 function Vector:multiply(b)
 	return Vector.new(self.x * b.x, self.y * b.y, self.z * b.z)
@@ -38,6 +42,10 @@ end
 
 function Vector:sqrtLength()
 	return self.x * self.x + self.y * self.y + self.z * self.z
+end
+
+function Vector:negate()
+	return Vector.new(-self.x, -self.y, -self.z)
 end
 
 -- cross product

@@ -3,7 +3,10 @@ Color.__index = Color
 
 function Color.new(red, green, blue)
 	local self = { r =  red, g = green, b = blue }
-	self.value = math.floor(255 * self.b )* math.pow(2, 16) + math.floor(255 * self.g) * math.pow(2, 8) + math.floor(255 * self.r)
+	local r = red > 1 and 1 or red
+	local g = green > 1 and 1 or green
+	local b = blue > 1 and 1 or blue
+	self.value = math.floor(255 * b )* math.pow(2, 16) + math.floor(255 * g) * math.pow(2, 8) + math.floor(255 * r)
 	setmetatable(self, Color)
 	return self
 end
@@ -22,9 +25,9 @@ function Color.__mul(c, factor)
 	local r = c.r * factor
 	local g = c.g * factor
 	local b = c.b * factor
-	r = r > 1 and 1 or r
-	g = g > 1 and 1 or g
-	b = b > 1 and 1 or b
+	-- r = r > 1 and 1 or r
+	-- g = g > 1 and 1 or g
+	-- b = b > 1 and 1 or b
 	return Color.new(r, g, b)
 end
 
